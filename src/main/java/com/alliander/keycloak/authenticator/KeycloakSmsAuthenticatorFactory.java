@@ -31,7 +31,8 @@ public class KeycloakSmsAuthenticatorFactory implements AuthenticatorFactory, Co
 
     public static final AuthenticationExecutionModel.Requirement[] REQUIREMENT_CHOICES = {
             AuthenticationExecutionModel.Requirement.REQUIRED,
-            AuthenticationExecutionModel.Requirement.OPTIONAL,
+            AuthenticationExecutionModel.Requirement.CONDITIONAL,
+            AuthenticationExecutionModel.Requirement.ALTERNATIVE,
             AuthenticationExecutionModel.Requirement.DISABLED};
 
     private static final List<ProviderConfigProperty> configProperties = new ArrayList<ProviderConfigProperty>();
@@ -70,14 +71,85 @@ public class KeycloakSmsAuthenticatorFactory implements AuthenticatorFactory, Co
         property.setHelpText("Use %sms-code% as placeholder for the generated SMS code. Use %user% and %password% as placeholder when 'In message' authentication is used.");
         configProperties.add(property);
 
+        
+     // SMS Token
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_METHOD);
+        property.setLabel("HTTP method");
+        property.setHelpText("");
+        List<String> methods = new ArrayList<>();
+        methods.add(HttpMethod.GET);
+        methods.add(HttpMethod.POST);
+        property.setType(ProviderConfigProperty.LIST_TYPE);
+        property.setOptions(methods);
+        configProperties.add(property);
+
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_URL);
+        property.setLabel("URL of SMS token");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("URL of token generator");
+        configProperties.add(property);
+        
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_AUTHTYPE);
+        property.setLabel("Authentication method");
+        property.setHelpText("");
+        List<String> tokenTypes = new ArrayList<>();
+        tokenTypes.add(SMSAuthenticatorContstants.BEARER);
+        tokenTypes.add(AUTH_METHOD_BASIC);
+        tokenTypes.add(AUTH_METHOD_INMESSAGE);
+        tokenTypes.add(SMSAuthenticatorContstants.NO_AUTH);
+        property.setType(ProviderConfigProperty.LIST_TYPE);
+        property.setOptions(tokenTypes);
+        configProperties.add(property);
+
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_CONTENT_TYPE);
+        property.setLabel("Content type");
+        property.setHelpText("");
+        List<String> types = new ArrayList<>();
+        types.add("application/json");
+        types.add("application/xml");
+        property.setType(ProviderConfigProperty.LIST_TYPE);
+        property.setOptions(types);
+        configProperties.add(property);
+        
+        
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_CLIENTID);
+        property.setLabel("SMS client ID");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("");
+        configProperties.add(property);
+
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_SECRET);
+        property.setLabel("Client ID Secret");
+        property.setType(ProviderConfigProperty.PASSWORD);
+        property.setHelpText("");
+        configProperties.add(property);
+        
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_TTL);
+        property.setLabel("SMS token time to live");
+        property.setType(ProviderConfigProperty.STRING_TYPE);
+        property.setHelpText("The validity of the SMS token in seconds.");
+        configProperties.add(property);
+        
+        
+
+        // SMS Authentication
+
+        
         // SMS Gateway
         property = new ProviderConfigProperty();
         property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_METHOD);
         property.setLabel("HTTP method");
         property.setHelpText("");
-        List<String> methods = new ArrayList(2);
-        methods.add(HttpMethod.GET);
-        methods.add(HttpMethod.POST);
+        List<String> smsmethods = new ArrayList<>();
+        smsmethods.add(HttpMethod.GET);
+        smsmethods.add(HttpMethod.POST);
         property.setType(ProviderConfigProperty.LIST_TYPE);
         property.setOptions(methods);
         configProperties.add(property);
@@ -90,66 +162,86 @@ public class KeycloakSmsAuthenticatorFactory implements AuthenticatorFactory, Co
         configProperties.add(property);
 
         property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_CONTENT_TYPE);
+        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_TOKEN_CONTENT_TYPE);
         property.setLabel("Content type");
         property.setHelpText("");
-        List<String> types = new ArrayList(2);
-        types.add("application/json");
-        types.add("application/xml");
+        List<String> smstypes = new ArrayList<>();
+        smstypes.add("application/json");
+        smstypes.add("application/xml");
         property.setType(ProviderConfigProperty.LIST_TYPE);
         property.setOptions(types);
         configProperties.add(property);
 
         // SMS Authentication
+
+        
+        //SMS query params
+        property = new ProviderConfigProperty();
+        property.setName(SMSAuthenticatorContstants.QUERY_PARAMS);
+        property.setLabel("SMS query parameters");
+        property.setHelpText("configure SMS query parameters");
+        property.setType(ProviderConfigProperty.MAP_TYPE);
+        configProperties.add(property);
+        
         property = new ProviderConfigProperty();
         property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_AUTHTYPE);
         property.setLabel("Authentication method");
         property.setHelpText("");
-        types = new ArrayList(2);
+        types = new ArrayList<>();
+        types.add(SMSAuthenticatorContstants.BEARER);
         types.add(AUTH_METHOD_BASIC);
         types.add(AUTH_METHOD_INMESSAGE);
+        types.add(SMSAuthenticatorContstants.NO_AUTH);
         property.setType(ProviderConfigProperty.LIST_TYPE);
         property.setOptions(types);
         configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_USERNAME);
-        property.setLabel("Username to authenticate towards the SMS Gateway");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("");
-        configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_PASSWORD);
-        property.setLabel("Password to authenticate towards the SMS Gateway");
-        property.setType(ProviderConfigProperty.PASSWORD);
-        property.setHelpText("");
-        configProperties.add(property);
-
-
-
-
-        // HTTP Proxy
-        property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_URL);
-        property.setLabel("URL of HTTP proxy to use when calling the SMS gateway");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("Emtpy when no proxy is needed");
-        configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_USERNAME);
-        property.setLabel("Username to authenticate towards the HTTP proxy");
-        property.setType(ProviderConfigProperty.STRING_TYPE);
-        property.setHelpText("");
-        configProperties.add(property);
-
-        property = new ProviderConfigProperty();
-        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_PASSWORD);
-        property.setLabel("Password to authenticate towards the HTTP proxy");
-        property.setType(ProviderConfigProperty.PASSWORD);
-        property.setHelpText("");
-        configProperties.add(property);
+        
+        //SMS body json sample
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.BODY);
+//        property.setLabel("SMS body json sample");
+//        property.setHelpText("import body json sample");
+//        property.setType(ProviderConfigProperty.STRING_TYPE);
+//        configProperties.add(property);
+        
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_USERNAME);
+//        property.setLabel("Username to authenticate towards the SMS Gateway");
+//        property.setType(ProviderConfigProperty.STRING_TYPE);
+//        property.setHelpText("");
+//        configProperties.add(property);
+//
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.CONF_PRP_SMS_PASSWORD);
+//        property.setLabel("Password to authenticate towards the SMS Gateway");
+//        property.setType(ProviderConfigProperty.PASSWORD);
+//        property.setHelpText("");
+//        configProperties.add(property);
+//        
+//
+//
+//
+//        // HTTP Proxy
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_URL);
+//        property.setLabel("URL of HTTP proxy to use when calling the SMS gateway");
+//        property.setType(ProviderConfigProperty.STRING_TYPE);
+//        property.setHelpText("Emtpy when no proxy is needed");
+//        configProperties.add(property);
+//
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_USERNAME);
+//        property.setLabel("Username to authenticate towards the HTTP proxy");
+//        property.setType(ProviderConfigProperty.STRING_TYPE);
+//        property.setHelpText("");
+//        configProperties.add(property);
+//
+//        property = new ProviderConfigProperty();
+//        property.setName(SMSAuthenticatorContstants.CONF_PRP_PROXY_PASSWORD);
+//        property.setLabel("Password to authenticate towards the HTTP proxy");
+//        property.setType(ProviderConfigProperty.PASSWORD);
+//        property.setHelpText("");
+//        configProperties.add(property);
 
     }
 
@@ -197,14 +289,14 @@ public class KeycloakSmsAuthenticatorFactory implements AuthenticatorFactory, Co
     }
 
     public List<ProviderConfigProperty> getConfigProperties() {
-        logger.debug("getConfigProperties called ... returning " + configProperties);
+    	logger.debug("getConfigProperties called ... returning " + configProperties);
         return configProperties;
     }
 
     public void init(Config.Scope config) {
         logger.debug("init called ... config.scope = " + config);
     }
-
+    
     public void postInit(KeycloakSessionFactory factory) {
         logger.debug("postInit called ... factory = " + factory);
     }

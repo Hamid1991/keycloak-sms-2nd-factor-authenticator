@@ -1,15 +1,21 @@
 package com.alliander.keycloak.authenticator;
 
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jboss.logging.Logger;
 import org.keycloak.authentication.AuthenticationFlowContext;
-import org.keycloak.common.util.Time;
 import org.keycloak.credential.CredentialModel;
+import org.keycloak.credential.UserCredentialStoreManager;
 import org.keycloak.models.AuthenticatorConfigModel;
-import org.keycloak.models.KeycloakSession;
-import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import java.util.List;
+import com.alliander.keycloak.authenticator.data.ConfigParam;
+import com.alliander.keycloak.authenticator.data.MapConfig;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * Created by joris on 18/11/2016.
@@ -29,36 +35,17 @@ public class SMSAuthenticatorUtil {
     }
 
 
-    public static String getCredentialValue(AuthenticationFlowContext context, String type) {
+    public static CredentialModel getCredentialValue(AuthenticationFlowContext context, String credentialName) {
+        UserCredentialStoreManager credentialStore = new UserCredentialStoreManager(context.getSession());
         CredentialModel result = null;
-
-        RealmModel realm = context.getRealm();
-        UserModel user = context.getUser();
-        KeycloakSession session = context.getSession();
-
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, type);
-        if (!creds.isEmpty()) result = creds.get(0);
-
-        return result.getValue();
-    }
-
-    public static void setCredentialValue(AuthenticationFlowContext context, String type, String value) {
-        RealmModel realm = context.getRealm();
-        UserModel user = context.getUser();
-        KeycloakSession session = context.getSession();
-
-        List<CredentialModel> creds = session.userCredentialManager().getStoredCredentialsByType(realm, user, type);
-        if (creds.isEmpty()) {
-            CredentialModel secret = new CredentialModel();
-            secret.setType(type);
-            secret.setValue(value);
-            secret.setCreatedDate(Time.currentTimeMillis());
-            session.userCredentialManager().createCredential(realm ,user, secret);
-        } else {
-            creds.get(0).setValue(value);
-            session.userCredentialManager().updateCredential(realm, user, creds.get(0));
+        List<CredentialModel> creds = credentialStore.getStoredCredentials(context.getRealm(), context.getUser());
+        for (CredentialModel cred : creds) {
+            if(cred.getType().equals(credentialName)) {
+               return cred;
+            }
         }
 
+        return result;
     }
 
     public static String getConfigString(AuthenticatorConfigModel config, String configName) {
@@ -96,5 +83,34 @@ public class SMSAuthenticatorUtil {
         }
 
         return value;
+    }
+    
+    public static Map<String, String> getMapConfig(AuthenticatorConfigModel config, String configName){
+    	Map<String, String> map = new HashMap<>(); 
+    	if(config.getConfig() != null) {
+    		Object obj = config.getConfig().get(configName);
+    		try {
+    			map = parameters(obj);
+    		} catch (Exception e) {
+    			 logger.error("Can not convert " + obj + " to a Map.");
+    		}
+    	}
+    	return map;
+    }
+    
+    public static Map<String, String> parameters(Object obj) {
+        Map<String, String> map = new HashMap<>();
+        ObjectMapper mapper = new ObjectMapper();
+        ConfigParam[] mapConfig = null;
+        try {
+			mapConfig = mapper.readValue(obj.toString(), ConfigParam[].class);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        for(ConfigParam param : mapConfig) {
+        	map.put(param.getKey(), param.getValue());
+        }
+        return map;
     }
 }

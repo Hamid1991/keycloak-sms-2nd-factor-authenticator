@@ -18,22 +18,21 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-core</artifactId>
-            <version>2.5.5.Final</version>
+            <version>10.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi</artifactId>
-            <version>2.5.5.Final</version>
+            <version>10.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-server-spi-private</artifactId>
-            <version>2.5.5.Final</version>
+            <version>10.0.2</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.logging</groupId>
             <artifactId>jboss-logging</artifactId>
@@ -43,7 +42,7 @@
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-services</artifactId>
-            <version>2.2.1.Final</version>
+            <version>10.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

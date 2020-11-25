@@ -9,14 +9,19 @@ public class SMSAuthenticatorContstants {
 
     // Configurable fields
     public static final String CONF_PRP_USR_ATTR_MOBILE = "sms-auth.attr.mobile";
+    public static final String CONF_PRP_SMS_TOKEN_TTL = "sms-auth.token.ttl";
     public static final String CONF_PRP_SMS_CODE_TTL = "sms-auth.code.ttl";
     public static final String CONF_PRP_SMS_CODE_LENGTH = "sms-auth.code.length";
     public static final String CONF_PRP_SMS_TEXT = "sms-auth.msg.text";
 
+    public static final String CONF_PRP_SMS_TOKEN_URL = "sms-auth.sms.token.url";
+    public static final String CONF_PRP_SMS_TOKEN_AUTHTYPE = "sms-auth.sms.token.authtype";
+    public static final String CONF_PRP_SMS_TOKEN_METHOD = "sms-auth.sms.token.method";
+    public static final String CONF_PRP_SMS_TOKEN_CONTENT_TYPE = "sms-auth.content.token.type";
     public static final String CONF_PRP_SMS_URL = "sms-auth.sms.url";
     public static final String CONF_PRP_SMS_METHOD = "sms-auth.sms.method";
-    public static final String CONF_PRP_SMS_USERNAME = "sms-auth.sms.username";
-    public static final String CONF_PRP_SMS_PASSWORD = "sms-auth.sms.password";
+    public static final String CONF_PRP_SMS_CLIENTID = "sms-auth.sms.username";
+    public static final String CONF_PRP_SMS_SECRET = "sms-auth.sms.password";
     public static final String CONF_PRP_SMS_AUTHTYPE = "sms-auth.sms.authtype";
     public static final String CONF_PRP_CONTENT_TYPE = "sms-auth.content.type";
 
@@ -29,7 +34,11 @@ public class SMSAuthenticatorContstants {
     public static final String USR_CRED_MDL_SMS_EXP_TIME = "sms-auth.exp-time";
 
     // Authentication methods
+    public static final String NO_AUTH = "No Auth";
     public static final String AUTH_METHOD_BASIC = "Basic authentication";
     public static final String AUTH_METHOD_INMESSAGE = "In message authentication";
+    public static final String QUERY_PARAMS="sms-params";
+    public static final String TOKEN_BODY = "token-body";
+    public static final String BEARER = "Bearer";
 
 }
